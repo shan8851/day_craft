@@ -4,6 +4,7 @@ export const todoTable = sqliteTable('todos', {
   id: integer("id").primaryKey(),
   text: text("content"),
   done: integer("done"),
+  archived: integer("archived"),
 });
 
 export const moodTable = sqliteTable('moods', {

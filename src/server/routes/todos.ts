@@ -11,7 +11,7 @@ export const todoRouter = router({
     return await db.select().from(todoTable).all();
   }),
   addTodo: publicProcedure.input(z.string()).mutation(async (opts) => {
-    return await db.insert(todoTable).values({ text: opts.input, done: 0 }).run();
+    return await db.insert(todoTable).values({ text: opts.input, done: 0, archived: 0 }).run();
   }),
   toggleTodo: publicProcedure.input(z.object({
     id: z.number(),
@@ -27,6 +27,16 @@ export const todoRouter = router({
     return await db
       .delete(todoTable)
       .where(eq(todoTable.id, opts.input))
+      .run();
+  }),
+  archiveTodo: publicProcedure.input(z.object({
+    id: z.number(),
+    archived: z.number(),
+  })).mutation(async (opts) => {
+    return await db
+      .update(todoTable)
+      .set({ archived: opts.input.archived })
+      .where(eq(todoTable.id, opts.input.id))
       .run();
   }),
 });

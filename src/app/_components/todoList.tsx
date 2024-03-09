@@ -26,6 +26,12 @@ export const TodoList = ({ initialTodos }:Props) => {
     },
   });
 
+  const archiveTodo = trpc.todos.archiveTodo.useMutation({
+    onSettled: () => {
+      getTodos.refetch();
+    },
+  });
+
   const deletTodo = trpc.todos.deleteTodo.useMutation({
     onSettled: () => {
       getTodos.refetch();
@@ -34,12 +40,14 @@ export const TodoList = ({ initialTodos }:Props) => {
   const [showAddTodo, setShowAddTodo] = useState(false);
   const [newTodo, setNewTodo] = useState('');
 
+  console.debug(getTodos.data)
+
   return (
     <div className="p-4 border border-black">
       <h1 className='text-3xl'>Todo List Section</h1>
 
       <div className="text-3xl">
-        {getTodos.data?.map((todo) => (
+        {getTodos.data?.filter(todo => todo.archived === 0).map((todo) => (
           <div className="flex gap-4 items-center" key={todo.id}>
             <Input
               id={`check-${todo.id}`}
@@ -51,6 +59,7 @@ export const TodoList = ({ initialTodos }:Props) => {
             <Label htmlFor={`check-${todo.id}`} className={todo.done ? 'line-through' : ''}>
               {todo.text}</Label>
               <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { deletTodo.mutate(todo.id); }}>Delete</Button>
+              <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { archiveTodo.mutate({ id: todo.id, archived: todo.archived ? 0 : 1 }) }}>Archive</Button>
           </div>
         ))}
       </div>

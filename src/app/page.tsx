@@ -7,6 +7,7 @@ export default async function Home() {
   const bookmarks = await serverClient.bookmarks.getBookmarks();
   return (
     <main className="flex min-h-screen flex-col gap-4 p-24">
+      <h1 className="text-6xl">Day_Craft</h1>
      <TodoList initialTodos={todos} />
      <BookmarksSection initialBookmarks={bookmarks} />
     </main>

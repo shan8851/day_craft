@@ -11,11 +11,6 @@ interface Props {
   >;
 }
 
-
-
-
-
-
 export const BookmarksSection = ({ initialBookmarks }: Props) => {
   const [showAddBookmark, setShowAddBookmark] = useState(false);
   const getBookmarks = trpc.bookmarks.getBookmarks.useQuery(undefined, {
@@ -23,7 +18,6 @@ export const BookmarksSection = ({ initialBookmarks }: Props) => {
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
-
 
   const addBookmark = trpc.bookmarks.addBookmark.useMutation({
   onSettled: () => {
@@ -39,24 +33,18 @@ const deleteBookmark = trpc.bookmarks.deleteBookmark.useMutation({
 
 const formRef = React.useRef<HTMLFormElement>(null);
 
-
-
 const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   let formData = new FormData(e.currentTarget);
   let bookmarkData = {
-    // Use the 'as string' type assertion for required fields
     title: formData.get('title') as string,
     url: formData.get('url') as string,
-    // Use '||' to provide an empty string as a fallback for optional fields
     description: (formData.get('description') as string) || '',
     type: (formData.get('type') as string) || '',
   };
 
-  // Now 'bookmarkData' is correctly typed, and you can use the addBookmark mutation
   await addBookmark.mutateAsync(bookmarkData);
 
-  // Reset the form using the ref
   if (formRef.current) {
     formRef.current.reset();
   }
