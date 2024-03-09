@@ -59,7 +59,7 @@ export const TodoList = ({ initialTodos }:Props) => {
         {getTodos.data?.map((todo) => (
           <div className="flex gap-4 items-center" key={todo.id}>
             <Input
-              id={`checl-${todo.id}`}
+              id={`check-${todo.id}`}
               type="checkbox"
               checked={!!todo.done}
               style={{ zoom: 1.5 }}
