@@ -5,28 +5,28 @@ import { Button, Input, Label } from 'react-aria-components';
 import { serverClient } from '../_trpc/serverClient';
 
 interface Props {
-  initialTodos: Awaited<ReturnType<(typeof serverClient)["getTodos"]>>
+  initialTodos: Awaited<ReturnType<(typeof serverClient)["todos"]["getTodos"]>>
 };
 
 
 export const TodoList = ({ initialTodos }:Props) => {
-  const getTodos = trpc.getTodos.useQuery(undefined, {
+  const getTodos = trpc.todos.getTodos.useQuery(undefined, {
     initialData: initialTodos,
     refetchOnMount: false,
     refetchOnReconnect: false,
   });
-  const addTodo = trpc.addTodo.useMutation({
+  const addTodo = trpc.todos.addTodo.useMutation({
     onSettled: () => {
       getTodos.refetch();
     },
   });
-  const toggleTodo = trpc.toggleTodo.useMutation({
+  const toggleTodo = trpc.todos.toggleTodo.useMutation({
     onSettled: () => {
       getTodos.refetch();
     },
   });
 
-  const deletTodo = trpc.deleteTodo.useMutation({
+  const deletTodo = trpc.todos.deleteTodo.useMutation({
     onSettled: () => {
       getTodos.refetch();
     },
