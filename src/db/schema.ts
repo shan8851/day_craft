@@ -2,28 +2,28 @@ import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core'
 
 export const todoTable = sqliteTable('todos', {
   id: integer("id").primaryKey(),
-  text: text("content").notNull(),
-  done: integer("done").notNull(),
+  text: text("content"),
+  done: integer("done"),
 });
 
 export const moodTable = sqliteTable('moods', {
   id: integer("id").primaryKey(),
-  mood: integer("mood").notNull(),
-  date: text("date").unique().notNull(),
+  mood: integer("mood"),
+  date: text("date"),
 });
 
 export const bookmarksTable = sqliteTable('bookmarks', {
   id: integer("id").primaryKey(),
-  url: text("url").unique().notNull(),
-  title: text("title").notNull(),
+  url: text("url"),
+  title: text("title"),
   description: text("description"),
   type: text("type"),
 });
 
 export const notesTable = sqliteTable('notes', {
   id: integer("id").primaryKey(),
-  title: text("title").notNull(),
-  content: text("content").notNull(),
+  title: text("title"),
+  content: text("content"),
 });
 
 export const pomodoroSettingsTable = sqliteTable('pomodoroSettings', {

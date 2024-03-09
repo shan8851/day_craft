@@ -31,13 +31,34 @@ export const TodoList = ({ initialTodos }:Props) => {
       getTodos.refetch();
     },
   });
-
+  const [showAddTodo, setShowAddTodo] = useState(false);
   const [newTodo, setNewTodo] = useState('');
 
   return (
-    <div>
-      <h1>Todo List</h1>
-      <div className="flex gap-2">
+    <div className="p-4 border border-black">
+      <h1 className='text-3xl'>Todo List Section</h1>
+
+      <div className="text-3xl">
+        {getTodos.data?.map((todo) => (
+          <div className="flex gap-4 items-center" key={todo.id}>
+            <Input
+              id={`check-${todo.id}`}
+              type="checkbox"
+              checked={!!todo.done}
+              style={{ zoom: 1.5 }}
+              onChange={async () => { toggleTodo.mutate({ id: todo.id, done: todo.done ? 0 : 1 }); }}
+            />
+            <Label htmlFor={`check-${todo.id}`} className={todo.done ? 'line-through' : ''}>
+              {todo.text}</Label>
+              <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { deletTodo.mutate(todo.id); }}>Delete</Button>
+          </div>
+        ))}
+      </div>
+      <Button onPress={() => setShowAddTodo(!showAddTodo)}>
+        {showAddTodo ? 'Cancel' : 'Add new Todo'}
+      </Button>
+      {showAddTodo && (
+        <div className="flex gap-2">
         <Input
           className="text-black"
           placeholder="Enter new todo..."
@@ -55,22 +76,7 @@ export const TodoList = ({ initialTodos }:Props) => {
           Add
         </Button>
       </div>
-      <div className="text-3xl">
-        {getTodos.data?.map((todo) => (
-          <div className="flex gap-4 items-center" key={todo.id}>
-            <Input
-              id={`check-${todo.id}`}
-              type="checkbox"
-              checked={!!todo.done}
-              style={{ zoom: 1.5 }}
-              onChange={async () => { toggleTodo.mutate({ id: todo.id, done: todo.done ? 0 : 1 }); }}
-            />
-            <Label htmlFor={`check-${todo.id}`} className={todo.done ? 'line-through' : ''}>
-              {todo.text}</Label>
-              <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { deletTodo.mutate(todo.id); }}>Delete</Button>
-          </div>
-        ))}
-      </div>
+      )}
     </div>
   );
 };
