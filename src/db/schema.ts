@@ -25,3 +25,11 @@ export const notesTable = sqliteTable('notes', {
   title: text("title").notNull(),
   content: text("content").notNull(),
 });
+
+export const pomodoroSettingsTable = sqliteTable('pomodoroSettings', {
+  id: integer("id").primaryKey(),
+  workDuration: integer("workDuration"),
+  shortBreakDuration: integer("shortBreakDuration"),
+  longBreakDuration: integer("longBreakDuration"),
+  longBreakInterval: integer("longBreakInterval"),
+});
