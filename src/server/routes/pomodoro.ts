@@ -1,8 +1,8 @@
 import { publicProcedure, router } from '../trpc';
 import { z } from 'zod';
 import { pomodoroSettingsTable } from '@/db/schema';
-import { db } from '@/db/db';
 import { eq } from 'drizzle-orm';
+import { db } from '@/db/db';
 
 export const pomodoroSettingsRouter = router({
 getSettings: publicProcedure.query(async () => {

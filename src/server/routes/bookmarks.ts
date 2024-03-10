@@ -1,8 +1,8 @@
 import { publicProcedure, router } from '../trpc';
 import { z } from 'zod';
-import { bookmarksTable } from '@/db/schema';
-import { db } from '@/db/db';
 import { eq } from 'drizzle-orm';
+import { db } from '@/db/db';
+import { bookmarksTable } from '@/db/schema';
 
 export const bookmarksRouter = router({
   getBookmarks: publicProcedure.query(async () => {

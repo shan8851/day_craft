@@ -1,7 +1,7 @@
 {
   "version": "5",
   "dialect": "sqlite",
-  "id": "a4677df5-69ec-4771-a3ae-71d68b6aca11",
+  "id": "cf7c974c-41f8-491c-893f-b70402a55eab",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "tables": {
     "bookmarks": {
@@ -171,6 +171,13 @@
         },
         "done": {
           "name": "done",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "archived": {
+          "name": "archived",
           "type": "integer",
           "primaryKey": false,
           "notNull": false,

@@ -29,5 +29,6 @@ CREATE TABLE `pomodoroSettings` (
 CREATE TABLE `todos` (
 	`id` integer PRIMARY KEY NOT NULL,
 	`content` text,
-	`done` integer
+	`done` integer,
+	`archived` integer
 );

@@ -1,17 +1,20 @@
 run:
-	npm run dev
+	pnpm run dev
 
 i:
-	npm i
+	pnpm i
 
 lint:
 	npm run lint
 
 build:
-	npm run build
+	pnpm run build
 
 clean:
 	rm -rf node_modules
 
-drizzle-migrate:
+generate:
 	npx drizzle-kit generate:sqlite
+
+db-push:
+	npx drizzle-kit push:sqlite
