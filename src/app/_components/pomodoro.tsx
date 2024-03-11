@@ -20,7 +20,7 @@ interface PomodoroProps {
 }
 
 export const Pomodoro = ({ settings }: PomodoroProps) => {
-  // State with types
+  const [showSettings, setShowSettings] = useState(settings ? false : true)
   const [workDuration, setWorkDuration] = useState<number>(
     settings?.workDuration || 25
   );
@@ -34,10 +34,9 @@ export const Pomodoro = ({ settings }: PomodoroProps) => {
     settings?.longBreakInterval || 4
   );
 
-  // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(workDuration * 60);
   const [isTimerRunning, setIsTimerRunning] = useState<boolean>(false);
-  const [pomodoroStage, setPomodoroStage] = useState<string>('work'); // Could be an enum
+  const [pomodoroStage, setPomodoroStage] = useState<string>('work'); // add enum
   const [cyclesCompleted, setCyclesCompleted] = useState<number>(0);
 
   const saveSettings = trpc.pomodoro.upsertSettings.useMutation();
@@ -102,7 +101,6 @@ export const Pomodoro = ({ settings }: PomodoroProps) => {
   return (
     <div className="p-4 border border-black">
       <h2 className="text-3xl font-extrabold">Pomodoro Timer</h2>
-      <div className="flex gap-2 justify-between">
         <div>
           <h3>Timer</h3>
           <div className="text-black font-extrabold text-9xl">
@@ -122,53 +120,56 @@ export const Pomodoro = ({ settings }: PomodoroProps) => {
             </Tooltip>
           </TooltipTrigger>
         </div>
-        <div>
+        <Button onPress={() => setShowSettings(!showSettings)} className="text-sm text-blue-500 cursor-pointer hover:text-blue-800">{`${showSettings ? 'hide' : 'show'} settings`}</Button>
+        {showSettings && (
+          <div>
           <h3>Settings</h3>
           <form className="flex flex-col gap-2" onSubmit={handleSettingsSubmit}>
+            <div className="flex flex-wrap gap-2">
+              <TextField>
+              <Label>Work duration:</Label>
+              <Input
+                type="number"
+                value={workDuration}
+                onChange={handleChange(setWorkDuration)}
+                placeholder="Work Duration (min)"
+              />
+            </TextField>
             <TextField>
-              <Label>Work duration:</Label>
+              <Label>Short break duration:</Label>
               <Input
                 type="number"
-                value={workDuration}
-                onChange={handleChange(setWorkDuration)}
-                placeholder="Work Duration (min)"
+                value={shortBreakDuration}
+                onChange={handleChange(setShortBreakDuration)}
+                placeholder="Short Break Duration (min)"
               />
             </TextField>
-                        <TextField>
-              <Label>Work duration:</Label>
+            <TextField>
+              <Label>Long break duration:</Label>
               <Input
                 type="number"
-                value={workDuration}
-                onChange={handleChange(setWorkDuration)}
-                placeholder="Work Duration (min)"
+                value={longBreakDuration}
+                onChange={handleChange(setLongBreakDuration)}
+                placeholder="Long Break Duration (min)"
               />
             </TextField>
-
-            <Input
-              type="number"
-              value={shortBreakDuration}
-              onChange={handleChange(setShortBreakDuration)}
-              placeholder="Short Break Duration (min)"
-            />
-            <Input
-              type="number"
-              value={longBreakDuration}
-              onChange={handleChange(setLongBreakDuration)}
-              placeholder="Long Break Duration (min)"
-            />
-            <Input
-              type="number"
-              value={longBreakInterval}
-              onChange={handleChange(setLongBreakInterval)}
-              placeholder="Long Break Interval"
-            />
+            <TextField>
+              <Label>Long break interval:</Label>
+              <Input
+                type="number"
+                value={longBreakInterval}
+                onChange={handleChange(setLongBreakInterval)}
+                placeholder="Long Break Interval"
+              />
+            </TextField>
+            </div>
             <Button
               className="border border-black rounded-xl py-2 px-4"
               type="submit"
             >{`${settings ? 'Update' : 'Save'} Settings`}</Button>
           </form>
         </div>
-      </div>
+        )}
     </div>
   );
 };

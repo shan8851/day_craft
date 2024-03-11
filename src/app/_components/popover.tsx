@@ -7,8 +7,8 @@ interface MyPopoverProps extends Omit<PopoverProps, 'children'> {
 export const PopoverComponent = ({ children, ...props }: MyPopoverProps) => {
   return (
     <Popover
-
     {...props}
+    className='py-2 px-4 border border-grey-200 rounded-xl bg-white'
     >
       <Dialog>
         {children}

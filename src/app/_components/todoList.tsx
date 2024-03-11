@@ -42,7 +42,7 @@ export const TodoList = ({ initialTodos }: Props) => {
   let triggerRef = React.useRef(null);
 
   return (
-    <div className="p-4 border border-black">
+    <div className="flex-1 p-4 border border-black">
       <h1 className="text-3xl">Todo List Section</h1>
 
       <div className="text-3xl">
