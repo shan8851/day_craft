@@ -1,15 +1,14 @@
 'use client';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { trpc } from '../_trpc/client';
-import { Button, Input, Label } from 'react-aria-components';
+import { Button, Input, Label, Popover } from 'react-aria-components';
 import { serverClient } from '../_trpc/serverClient';
 
 interface Props {
-  initialTodos: Awaited<ReturnType<(typeof serverClient)["todos"]["getTodos"]>>
-};
+  initialTodos: Awaited<ReturnType<(typeof serverClient)['todos']['getTodos']>>;
+}
 
-
-export const TodoList = ({ initialTodos }:Props) => {
+export const TodoList = ({ initialTodos }: Props) => {
   const getTodos = trpc.todos.getTodos.useQuery(undefined, {
     initialData: initialTodos,
     refetchOnMount: false,
@@ -40,52 +39,83 @@ export const TodoList = ({ initialTodos }:Props) => {
   const [showAddTodo, setShowAddTodo] = useState(false);
   const [newTodo, setNewTodo] = useState('');
 
-  console.debug(getTodos.data)
+  let triggerRef = React.useRef(null);
 
   return (
     <div className="p-4 border border-black">
-      <h1 className='text-3xl'>Todo List Section</h1>
+      <h1 className="text-3xl">Todo List Section</h1>
 
       <div className="text-3xl">
-        {getTodos.data?.filter(todo => todo.archived === 0).map((todo) => (
-          <div className="flex gap-4 items-center" key={todo.id}>
-            <Input
-              id={`check-${todo.id}`}
-              type="checkbox"
-              checked={!!todo.done}
-              style={{ zoom: 1.5 }}
-              onChange={async () => { toggleTodo.mutate({ id: todo.id, done: todo.done ? 0 : 1 }); }}
-            />
-            <Label htmlFor={`check-${todo.id}`} className={todo.done ? 'line-through' : ''}>
-              {todo.text}</Label>
-              <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { deletTodo.mutate(todo.id); }}>Delete</Button>
-              <Button className='border border-black rounded-lg py-2 px-4 text-sm' onPress={async () => { archiveTodo.mutate({ id: todo.id, archived: todo.archived ? 0 : 1 }) }}>Archive</Button>
-          </div>
-        ))}
+        {getTodos.data
+          ?.filter((todo) => todo.archived === 0)
+          .map((todo) => (
+            <div className="flex gap-4 items-center" key={todo.id}>
+              <Input
+                id={`check-${todo.id}`}
+                type="checkbox"
+                checked={!!todo.done}
+                style={{ zoom: 1.5 }}
+                onChange={async () => {
+                  toggleTodo.mutate({ id: todo.id, done: todo.done ? 0 : 1 });
+                }}
+              />
+              <Label
+                htmlFor={`check-${todo.id}`}
+                className={todo.done ? 'line-through' : ''}
+              >
+                {todo.text}
+              </Label>
+              <Button
+                className="border border-black rounded-lg py-2 px-4 text-sm"
+                onPress={async () => {
+                  deletTodo.mutate(todo.id);
+                }}
+              >
+                Delete
+              </Button>
+              <Button
+                className="border border-black rounded-lg py-2 px-4 text-sm"
+                onPress={async () => {
+                  archiveTodo.mutate({
+                    id: todo.id,
+                    archived: todo.archived ? 0 : 1,
+                  });
+                }}
+              >
+                Archive
+              </Button>
+            </div>
+          ))}
       </div>
-      <Button onPress={() => setShowAddTodo(!showAddTodo)}>
-        {showAddTodo ? 'Cancel' : 'Add new Todo'}
+      <Button ref={triggerRef} onPress={() => setShowAddTodo(true)}>
+        Add new todo
       </Button>
-      {showAddTodo && (
-        <div className="flex gap-2">
-        <Input
-          className="text-black"
-          placeholder="Enter new todo..."
-          value={newTodo}
-          onChange={(e) => setNewTodo(e.target.value)}
-        />
-        <Button
-          isDisabled={!newTodo}
-          onPress={async () => {
-            if (newTodo.trim() === '') return;
-            await addTodo.mutate(newTodo);
-            setNewTodo('');
-          }}
-        >
-          Add
-        </Button>
-      </div>
-      )}
+      <Popover
+            placement='end'
+      triggerRef={triggerRef}
+      isOpen={showAddTodo}
+      onOpenChange={setShowAddTodo}
+      className='py-2 px-4 border border-grey-200 rounded-xl bg-white'
+      >
+      <div className="flex gap-2">
+          <Input
+            className="text-black"
+            placeholder="Enter new todo..."
+            value={newTodo}
+            onChange={(e) => setNewTodo(e.target.value)}
+          />
+          <Button
+            isDisabled={!newTodo}
+            onPress={async () => {
+              if (newTodo.trim() === '') return;
+              await addTodo.mutate(newTodo);
+              setNewTodo('');
+            }}
+          >
+            Add
+          </Button>
+        </div>
+      </Popover>
     </div>
   );
 };

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 import { trpc } from '../_trpc/client';
-import { Button, Form, Input, Label, TextField } from 'react-aria-components';
+import { Button, Form, Input, Label, Popover, TextField } from 'react-aria-components';
 import { serverClient } from '../_trpc/serverClient';
 import Link from 'next/link';
 
@@ -50,6 +50,8 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
+let triggerRef = React.useRef(null);
+
 
 
   return (
@@ -71,10 +73,17 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
           </div>
         ))}
       </div>
-      <Button onPress={() => setShowAddBookmark(!showAddBookmark)}>
-        {showAddBookmark ? 'Cancel' : 'Add new Bookmark'}
+      <Button ref={triggerRef} onPress={() => setShowAddBookmark(true)}>
+        Add new bookmark
       </Button>
       {showAddBookmark && (
+      <Popover
+      placement='end'
+      triggerRef={triggerRef}
+      isOpen={showAddBookmark}
+      onOpenChange={setShowAddBookmark}
+      className='py-2 px-4 border border-grey-200 rounded-xl bg-white'
+      >
         <Form ref={formRef} onSubmit={onSubmit}>
         <TextField name="title">
           <Label>Title</Label>
@@ -94,6 +103,7 @@ const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         </TextField>
         <Button type="submit">Submit</Button>
       </Form>
+      </Popover>
       )}
     </div>
   );

@@ -6,7 +6,10 @@ interface MyPopoverProps extends Omit<PopoverProps, 'children'> {
 
 export const PopoverComponent = ({ children, ...props }: MyPopoverProps) => {
   return (
-    <Popover {...props}>
+    <Popover
+
+    {...props}
+    >
       <Dialog>
         {children}
       </Dialog>

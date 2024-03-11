@@ -1,13 +1,38 @@
-"use client"
+'use client';
 
 import React, { useState, useEffect, FormEvent, ChangeEvent } from 'react';
+import { serverClient } from '../_trpc/serverClient';
+import {
+  Button,
+  Input,
+  Label,
+  Text,
+  TextField,
+  Tooltip,
+  TooltipTrigger,
+} from 'react-aria-components';
+import { trpc } from '../_trpc/client';
 
-export const Pomodoro: React.FC = () => {
+interface PomodoroProps {
+  settings: Awaited<
+    ReturnType<(typeof serverClient)['pomodoro']['getSettings']>
+  >;
+}
+
+export const Pomodoro = ({ settings }: PomodoroProps) => {
   // State with types
-  const [workDuration, setWorkDuration] = useState<number>(25);
-  const [shortBreakDuration, setShortBreakDuration] = useState<number>(5);
-  const [longBreakDuration, setLongBreakDuration] = useState<number>(15);
-  const [longBreakInterval, setLongBreakInterval] = useState<number>(4);
+  const [workDuration, setWorkDuration] = useState<number>(
+    settings?.workDuration || 25
+  );
+  const [shortBreakDuration, setShortBreakDuration] = useState<number>(
+    settings?.shortBreakDuration || 5
+  );
+  const [longBreakDuration, setLongBreakDuration] = useState<number>(
+    settings?.longBreakDuration || 15
+  );
+  const [longBreakInterval, setLongBreakInterval] = useState<number>(
+    settings?.longBreakInterval || 4
+  );
 
   // Timer states
   const [timeLeft, setTimeLeft] = useState<number>(workDuration * 60);
@@ -15,13 +40,17 @@ export const Pomodoro: React.FC = () => {
   const [pomodoroStage, setPomodoroStage] = useState<string>('work'); // Could be an enum
   const [cyclesCompleted, setCyclesCompleted] = useState<number>(0);
 
+  const saveSettings = trpc.pomodoro.upsertSettings.useMutation();
+
   useEffect(() => {
-    const timer: ReturnType<typeof setInterval> | null = isTimerRunning ? setInterval(() => {
-      setTimeLeft((prevTime) => prevTime - 1);
-      if (timeLeft === 1) {
-        switchStage();
-      }
-    }, 1000) : null;
+    const timer: ReturnType<typeof setInterval> | null = isTimerRunning
+      ? setInterval(() => {
+          setTimeLeft((prevTime) => prevTime - 1);
+          if (timeLeft === 1) {
+            switchStage();
+          }
+        }, 1000)
+      : null;
 
     return () => {
       if (timer) {
@@ -48,14 +77,21 @@ export const Pomodoro: React.FC = () => {
 
   const handleSettingsSubmit = (e: FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
-    // Here, integrate with your upsertSettings mutation to save settings
+    saveSettings.mutate({
+      workDuration,
+      shortBreakDuration,
+      longBreakDuration,
+      longBreakInterval,
+    });
     setTimeLeft(workDuration * 60);
     setIsTimerRunning(false);
   };
 
-  const handleChange = (setter: React.Dispatch<React.SetStateAction<number>>) => (e: ChangeEvent<HTMLInputElement>): void => {
-    setter(Number(e.target.value));
-  };
+  const handleChange =
+    (setter: React.Dispatch<React.SetStateAction<number>>) =>
+    (e: ChangeEvent<HTMLInputElement>): void => {
+      setter(Number(e.target.value));
+    };
 
   const formatTimeLeft = (): string => {
     const minutes: number = Math.floor(timeLeft / 60);
@@ -64,27 +100,75 @@ export const Pomodoro: React.FC = () => {
   };
 
   return (
-    <div>
-      <h2>Pomodoro Timer</h2>
-      <div>
-        <h3>Settings</h3>
-        <form onSubmit={handleSettingsSubmit}>
-          <input type="number" value={workDuration} onChange={handleChange(setWorkDuration)} placeholder="Work Duration (min)" />
-          <input type="number" value={shortBreakDuration} onChange={handleChange(setShortBreakDuration)} placeholder="Short Break Duration (min)" />
-          <input type="number" value={longBreakDuration} onChange={handleChange(setLongBreakDuration)} placeholder="Long Break Duration (min)" />
-          <input type="number" value={longBreakInterval} onChange={handleChange(setLongBreakInterval)} placeholder="Long Break Interval" />
-          <button type="submit">Save Settings</button>
-        </form>
-      </div>
-      <div>
-        <h3>Timer</h3>
-        <div>{formatTimeLeft()}</div>
-        <div>Stage: {pomodoroStage}</div>
-        <button onClick={() => setIsTimerRunning(!isTimerRunning)}>
-          {isTimerRunning ? 'Pause' : 'Start'}
-        </button>
+    <div className="p-4 border border-black">
+      <h2 className="text-3xl font-extrabold">Pomodoro Timer</h2>
+      <div className="flex gap-2 justify-between">
+        <div>
+          <h3>Timer</h3>
+          <div className="text-black font-extrabold text-9xl">
+            {formatTimeLeft()}
+          </div>
+          <div>Stage: {pomodoroStage}</div>
+          <TooltipTrigger delay={0}>
+            <Button
+              isDisabled={!settings}
+              onPress={() => setIsTimerRunning(!isTimerRunning)}
+              className="text-white bg-black rounded-lg py-2 px-4"
+            >
+              {isTimerRunning ? 'Pause' : 'Start'}
+            </Button>
+            <Tooltip className="p-1 border border-gray-200 bg-white rounded-xl">
+              Save your settings before using the timer
+            </Tooltip>
+          </TooltipTrigger>
+        </div>
+        <div>
+          <h3>Settings</h3>
+          <form className="flex flex-col gap-2" onSubmit={handleSettingsSubmit}>
+            <TextField>
+              <Label>Work duration:</Label>
+              <Input
+                type="number"
+                value={workDuration}
+                onChange={handleChange(setWorkDuration)}
+                placeholder="Work Duration (min)"
+              />
+            </TextField>
+                        <TextField>
+              <Label>Work duration:</Label>
+              <Input
+                type="number"
+                value={workDuration}
+                onChange={handleChange(setWorkDuration)}
+                placeholder="Work Duration (min)"
+              />
+            </TextField>
+
+            <Input
+              type="number"
+              value={shortBreakDuration}
+              onChange={handleChange(setShortBreakDuration)}
+              placeholder="Short Break Duration (min)"
+            />
+            <Input
+              type="number"
+              value={longBreakDuration}
+              onChange={handleChange(setLongBreakDuration)}
+              placeholder="Long Break Duration (min)"
+            />
+            <Input
+              type="number"
+              value={longBreakInterval}
+              onChange={handleChange(setLongBreakInterval)}
+              placeholder="Long Break Interval"
+            />
+            <Button
+              className="border border-black rounded-xl py-2 px-4"
+              type="submit"
+            >{`${settings ? 'Update' : 'Save'} Settings`}</Button>
+          </form>
+        </div>
       </div>
     </div>
   );
 };
-
